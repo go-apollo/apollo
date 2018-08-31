@@ -1,11 +1,11 @@
-# gopkg.in/apollo
+# Gopkg.in/apollo
+
+[![Build Status](https://travis-ci.org/go-apollo/apollo.svg?branch=master)](https://travis-ci.org/go-apollo/apollo)
+[![Go Report Card](https://goreportcard.com/badge/github.com/go-apollo/apollo)](https://goreportcard.com/report/github.com/go-apollo/apollo)
 
 ## Purpose
 
-The goal of this project is to make the easiest way of using Ctrip apollo for golang applications. This project has been forked from [philchia/agollo](https://github.com/philchia/agollo) since 2018.8 but change a lot
-
-## Simple chinese
-
+The goal of this project is to make the easiest way of using Ctrip apollo for golang applications. This project has been forked from [philchia/agollo](https://github.com/philchia/agollo) since 2018.8 but change a lot.
 
 ## Feature
 
