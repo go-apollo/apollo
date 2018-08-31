@@ -32,7 +32,7 @@ func teardown() {
 	mockserver.Close()
 }
 
-func TestapolloStart(t *testing.T) {
+func TestApolloStart(t *testing.T) {
 	if err := Start(); err == nil {
 		t.Errorf("Start with default app.properties should return err, got :%v", err)
 	}
