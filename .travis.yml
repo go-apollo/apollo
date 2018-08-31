@@ -27,9 +27,12 @@ notifications:
 # flunk the build and immediately stop. It's sorta like having
 # set -e enabled in bash. 
 before_script:
+  - mkdir -p $HOME/gopath/src/gopkg.in
   - echo $TRAVIS_BUILD_DIR
+  - mv $TRAVIS_BUILD_DIR $HOME/gopath/src/gopkg.in/
+  - export TRAVIS_BUILD_DIR=$HOME/gopath/src/gopkg.in/apollo
   - GO_FILES=$(find . -iname '*.go' -type f | egrep -v '/vendor') # All the .go files, excluding vendor/
-  - go get -u golang.org/x/lint/golint                                   # Linter
+  - go get -u github.com/golang/lint/golint                                   # Linter
   - go get honnef.co/go/tools/cmd/megacheck                              # Badass static analyzer/linter
   - go get github.com/fzipp/gocyclo
   
