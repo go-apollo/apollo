@@ -1,21 +1,16 @@
-# agollo is a golang client for apollo 🚀 [![CircleCI](https://circleci.com/gh/philchia/agollo/tree/master.svg?style=svg)](https://circleci.com/gh/philchia/agollo/tree/master)
+# gopkg.in/apollo
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/philchia/agollo)](https://goreportcard.com/report/github.com/philchia/agollo)
-[![codebeat badge](https://codebeat.co/badges/e31b4a09-f531-4b74-a86a-775f46436539)](https://codebeat.co/projects/github-com-philchia-agollo-master)
-[![Coverage Status](https://coveralls.io/repos/github/philchia/agollo/badge.svg?branch=master)](https://coveralls.io/github/philchia/agollo?branch=master)
-[![golang](https://img.shields.io/badge/Language-Go-green.svg?style=flat)](https://golang.org)
-[![GoDoc](https://godoc.org/github.com/philchia/zen?status.svg)](https://godoc.org/github.com/philchia/agollo)
-![GitHub release](https://img.shields.io/github/release/philchia/agollo.svg)
+## Purpose
+
+The goal of this project is to make the easiest way of using Ctrip apollo for golang applications. This project has been forked from [philchia/agollo](https://github.com/philchia/agollo) since 2018.8 but change a lot
 
 ## Simple chinese
 
-[简体中文](./README_CN.md)
 
 ## Feature
 
 * Multiple namespace support
 * Fail tolerant
-* Zero dependency
 
 ## Required
 
@@ -24,7 +19,9 @@
 ## Installation
 
 ```sh
-    go get -u github.com/philchia/agollo
+    go get -u gopkg.in/apollo
+    //if you use dep as your golang dep tool
+    dep ensure -add  gopkg.in/apollo
 ```
 
 ## Usage
@@ -32,19 +29,19 @@
 ### Start use default app.properties config file
 
 ```golang
-    agollo.Start()
+    apollo.Start()
 ```
 
 ### Start use given config file path
 
 ```golang
-    agollo.StartWithConfFile(name)
+    apollo.StartWithConfFile(name)
 ```
 
 ### Subscribe to updates
 
 ```golang
-    events := agollo.WatchUpdate()
+    events := apollo.WatchUpdate()
     changeEvent := <-events
     bytes, _ := json.Marshal(changeEvent)
     fmt.Println("event:", string(bytes))
@@ -53,16 +50,16 @@
 ### Get apollo values
 
 ```golang
-    agollo.GetStringValue(Key, defaultValue)
-    agollo.GetStringValueWithNameSapce(namespace, key, defaultValue)
+    apollo.GetStringValue(Key, defaultValue)
+    apollo.GetStringValueWithNameSapce(namespace, key, defaultValue)
 ```
 
 ### Get namespace file contents
 
 ```golang
-    agollo.GetNameSpaceContent(namespace, defaultValue)
+    apollo.GetNameSpaceContent(namespace, defaultValue)
 ```
 
 ## License
 
-agollo is released under MIT lecense
+apollo is released under MIT lecense

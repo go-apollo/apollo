@@ -1,17 +1,20 @@
-package agollo
+//Copyright (c) 2017 Phil
+
+package apollo
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
+
+	"gopkg.in/yaml.v2"
 )
 
 // Conf ...
 type Conf struct {
-	AppID          string   `json:"appId,omitempty"`
-	Cluster        string   `json:"cluster,omitempty"`
-	NameSpaceNames []string `json:"namespaceNames,omitempty"`
-	IP             string   `json:"ip,omitempty"`
+	AppID      string   `yaml:"appId"`
+	Cluster    string   `yaml:"cluster"`
+	Namespaces []string `yaml:"namespaces,flow"`
+	IP         string   `json:"ip"`
 }
 
 // NewConf create Conf from file
@@ -24,7 +27,8 @@ func NewConf(name string) (*Conf, error) {
 	defer f.Close()
 
 	var ret Conf
-	if err := json.NewDecoder(f).Decode(&ret); err != nil {
+
+	if err := yaml.NewDecoder(f).Decode(&ret); err != nil {
 		return nil, err
 	}
 

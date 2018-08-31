@@ -1,4 +1,5 @@
-package agollo
+//Copyright (c) 2017 Phil
+package apollo
 
 import (
 	"io/ioutil"
@@ -35,7 +36,7 @@ func TestCacheDump(t *testing.T) {
 	defer caches.drain()
 	caches.mustGetCache("namespace").set("key", "val")
 
-	f, err := ioutil.TempFile(".", "agollo")
+	f, err := ioutil.TempFile(".", "apollo")
 	if err != nil {
 		t.Error(err)
 	}

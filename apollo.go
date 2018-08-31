@@ -1,15 +1,18 @@
-package agollo
+//Copyright (c) 2017 Phil
+
+//Package apollo ctrip apollo go client
+package apollo
 
 var (
 	defaultClient *Client
 )
 
-// Start agollo
+// Start apollo
 func Start() error {
 	return StartWithConfFile(defaultConfName)
 }
 
-// StartWithConfFile run agollo with conf file
+// StartWithConfFile run apollo with conf file
 func StartWithConfFile(name string) error {
 	conf, err := NewConf(name)
 	if err != nil {
@@ -18,7 +21,7 @@ func StartWithConfFile(name string) error {
 	return StartWithConf(conf)
 }
 
-// StartWithConf run agollo with Conf
+// StartWithConf run apollo with Conf
 func StartWithConf(conf *Conf) error {
 	defaultClient = NewClient(conf)
 

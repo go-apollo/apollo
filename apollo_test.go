@@ -1,4 +1,6 @@
-package agollo
+//Copyright (c) 2017 Phil
+
+package apollo
 
 import (
 	"log"
@@ -6,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/philchia/agollo/internal/mockserver"
+	"gopkg.in/apollo/internal/mockserver"
 )
 
 func TestMain(m *testing.M) {
@@ -30,7 +32,7 @@ func teardown() {
 	mockserver.Close()
 }
 
-func TestAgolloStart(t *testing.T) {
+func TestapolloStart(t *testing.T) {
 	if err := Start(); err == nil {
 		t.Errorf("Start with default app.properties should return err, got :%v", err)
 	}
@@ -84,14 +86,14 @@ func TestAgolloStart(t *testing.T) {
 		t.Errorf("GetStringValue of key should = defaultValue, got %v", val)
 	}
 
-	mockserver.Set("client.json", "content", `{"name":"agollo"}`)
+	mockserver.Set("client.json", "content", `{"name":"apollo"}`)
 	select {
 	case <-updates:
 	case <-time.After(time.Millisecond * 30000):
 	}
 
 	val = GetNameSpaceContent("client.json", "{}")
-	if val != `{"name":"agollo"}` {
-		t.Errorf(`GetStringValue of client.json content should  = {"name":"agollo"}, got %v`, val)
+	if val != `{"name":"apollo"}` {
+		t.Errorf(`GetStringValue of client.json content should  = {"name":"apollo"}, got %v`, val)
 	}
 }

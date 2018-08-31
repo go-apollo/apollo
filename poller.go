@@ -1,4 +1,6 @@
-package agollo
+//Copyright (c) 2017 Phil
+
+package apollo
 
 import (
 	"context"
@@ -46,7 +48,7 @@ func newLongPoller(conf *Conf, interval time.Duration, handler notificationHandl
 		notifications:  new(notificatonRepo),
 		handler:        handler,
 	}
-	for _, namespace := range conf.NameSpaceNames {
+	for _, namespace := range conf.Namespaces {
 		poller.notifications.setNotificationID(namespace, defaultNotificationID)
 	}
 

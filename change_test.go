@@ -1,4 +1,5 @@
-package agollo
+//Copyright (c) 2017 Phil
+package apollo
 
 import "testing"
 

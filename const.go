@@ -1,4 +1,6 @@
-package agollo
+//Copyright (c) 2017 Phil
+
+package apollo
 
 import (
 	"time"
@@ -6,7 +8,7 @@ import (
 
 const (
 	defaultConfName  = "app.properties"
-	defaultDumpFile  = ".agollo"
+	defaultDumpFile  = ".apollo"
 	defaultNamespace = "application"
 
 	longPoolInterval      = time.Second * 2

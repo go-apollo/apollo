@@ -1,0 +1,7 @@
+appId: SampleApp
+cluster: default
+namespaces:
+- application
+- notexist 
+- client.json
+ip: localhost:8080
