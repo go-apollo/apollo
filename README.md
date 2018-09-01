@@ -9,8 +9,10 @@ The goal of this project is to make the easiest way of using Ctrip apollo for go
 
 ## Feature
 
-* Multiple namespace support
-* Fail tolerant
+- ✅ Multiple namespace support
+- ✅ Fail tolerant
+- ❎  YML to struct 
+- ❎  Custom logger
 
 ## Required
 
