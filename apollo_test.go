@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/apollo/internal/mockserver"
+	"gopkg.in/apollo.v0/internal/mockserver"
 )
 
 func TestMain(m *testing.M) {
