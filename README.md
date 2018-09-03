@@ -21,9 +21,9 @@ The goal of this project is to make the easiest way of using Ctrip apollo for go
 ## Installation
 
 ```sh
-    go get -u gopkg.in/apollo
+    go get -u gopkg.in/apollo.v0
     //if you use dep as your golang dep tool
-    dep ensure -add  gopkg.in/apollo
+    dep ensure -add  gopkg.in/apollo.v0
 ```
 
 ## Usage
