@@ -12,7 +12,7 @@ import (
 // this is a static check
 var _ poller = (*longPoller)(nil)
 
-// poller fetch confi updates
+// poller fetch config updates
 type poller interface {
 	// start poll updates
 	start()
