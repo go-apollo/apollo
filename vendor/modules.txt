@@ -1,0 +1,4 @@
+# gopkg.in/apollo.v0 v0.1.0
+gopkg.in/apollo.v0/internal/mockserver
+# gopkg.in/yaml.v2 v2.2.1
+gopkg.in/yaml.v2

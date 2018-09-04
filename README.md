@@ -26,6 +26,13 @@ The goal of this project is to make the easiest way of using Ctrip apollo for go
     dep ensure -add  gopkg.in/apollo.v0
 ```
 
+## Build
+If you want build this project,should use go 1.11
+```
+GO111MODULE=on; go mod download
+
+```
+
 ## Usage
 
 ### Start use default app.yml config file
