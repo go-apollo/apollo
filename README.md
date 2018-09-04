@@ -28,7 +28,7 @@ The goal of this project is to make the easiest way of using Ctrip apollo for go
 
 ## Usage
 
-### Start use default app.properties config file
+### Start use default app.yml config file
 
 ```golang
     apollo.Start()
