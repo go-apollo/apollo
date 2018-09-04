@@ -1,6 +1,3 @@
-module github.com/veily/goapollo
+module gopkg.in/apollo.v0
 
-require (
-	gopkg.in/apollo.v0 v0.1.0
-	gopkg.in/yaml.v2 v2.2.1
-)
+require gopkg.in/yaml.v2 v2.2.1
