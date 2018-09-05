@@ -41,7 +41,7 @@ func TestApolloStart(t *testing.T) {
 		t.Errorf("Start with fake.properties should return err, got :%v", err)
 	}
 
-	if err := StartWithConfFile("./testdata/app.properties"); err != nil {
+	if err := StartWithConfFile("./testdata/app.yml"); err != nil {
 		t.Errorf("Start with app.properties should return nil, got :%v", err)
 	}
 	defer Stop()

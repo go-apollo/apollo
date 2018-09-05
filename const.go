@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	defaultConfName  = "app.properties"
+	defaultConfName  = "app.yml"
 	defaultDumpFile  = ".apollo"
 	defaultNamespace = "application"
 
