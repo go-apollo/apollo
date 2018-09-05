@@ -38,14 +38,14 @@ func WatchUpdate() <-chan *ChangeEvent {
 	return defaultClient.WatchUpdate()
 }
 
-// GetStringValueWithNameSapce get value from given namespace
-func GetStringValueWithNameSapce(namespace, key, defaultValue string) string {
-	return defaultClient.GetStringValueWithNameSapce(namespace, key, defaultValue)
+// GetStringValueWithNameSpace get value from given namespace
+func GetStringValueWithNameSpace(namespace, key, defaultValue string) string {
+	return defaultClient.GetStringValueWithNameSpace(namespace, key, defaultValue)
 }
 
 // GetStringValue from default namespace
 func GetStringValue(key, defaultValue string) string {
-	return GetStringValueWithNameSapce(defaultNamespace, key, defaultValue)
+	return GetStringValueWithNameSpace(defaultNamespace, key, defaultValue)
 }
 
 // GetNameSpaceContent get contents of namespace

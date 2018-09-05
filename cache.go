@@ -13,7 +13,7 @@ type namespaceCache struct {
 	caches map[string]*cache
 }
 
-func newNamespaceCahce() *namespaceCache {
+func newNamespaceCache() *namespaceCache {
 	return &namespaceCache{
 		caches: map[string]*cache{},
 	}
@@ -43,7 +43,7 @@ func (n *namespaceCache) drain() {
 
 func (n *namespaceCache) dump(name string) error {
 
-	var dumps = map[string]map[string]string{}
+	var dumps = map[string]map[string][]byte{}
 
 	for namespace, cache := range n.caches {
 		dumps[namespace] = cache.dump()
@@ -67,7 +67,7 @@ func (n *namespaceCache) load(name string) error {
 	}
 	defer f.Close()
 
-	var dumps = map[string]map[string]string{}
+	var dumps = map[string]map[string][]byte{}
 
 	if err := gob.NewDecoder(f).Decode(&dumps); err != nil {
 		return err
@@ -93,28 +93,28 @@ func newCache() *cache {
 	}
 }
 
-func (c *cache) set(key, val string) {
+func (c *cache) set(key string, val []byte) {
 	c.kv.Store(key, val)
 }
 
-func (c *cache) get(key string) (string, bool) {
+func (c *cache) get(key string) ([]byte, bool) {
 	if val, ok := c.kv.Load(key); ok {
-		if ret, ok := val.(string); ok {
+		if ret, ok := val.([]byte); ok {
 			return ret, true
 		}
 	}
-	return "", false
+	return nil, false
 }
 
 func (c *cache) delete(key string) {
 	c.kv.Delete(key)
 }
 
-func (c *cache) dump() map[string]string {
-	var ret = map[string]string{}
+func (c *cache) dump() map[string][]byte {
+	var ret = map[string][]byte{}
 	c.kv.Range(func(key, val interface{}) bool {
 		k, _ := key.(string)
-		v, _ := val.(string)
+		v, _ := val.([]byte)
 		ret[k] = v
 
 		return true
