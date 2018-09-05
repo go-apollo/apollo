@@ -5,6 +5,7 @@ package apollo
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -12,7 +13,7 @@ import (
 // this is a static check
 var _ poller = (*longPoller)(nil)
 
-// poller fetch confi updates
+// poller fetch config updates
 type poller interface {
 	// start poll updates
 	start()
@@ -35,7 +36,7 @@ type longPoller struct {
 
 	requester requester
 
-	notifications *notificatonRepo
+	notifications *notificationRepo
 	handler       notificationHandler
 }
 
@@ -45,7 +46,7 @@ func newLongPoller(conf *Conf, interval time.Duration, handler notificationHandl
 		conf:           conf,
 		pollerInterval: interval,
 		requester:      newHTTPRequester(&http.Client{Timeout: longPoolTimeout}),
-		notifications:  new(notificatonRepo),
+		notifications:  new(notificationRepo),
 		handler:        handler,
 	}
 	for _, namespace := range conf.Namespaces {
@@ -64,7 +65,6 @@ func (p *longPoller) preload() error {
 }
 
 func (p *longPoller) watchUpdates() {
-
 	p.ctx, p.cancel = context.WithCancel(context.Background())
 	defer p.cancel()
 
@@ -74,7 +74,11 @@ func (p *longPoller) watchUpdates() {
 	for {
 		select {
 		case <-timer.C:
-			p.pumpUpdates()
+			err := p.pumpUpdates()
+			//TODO handle error
+			if err != nil {
+				fmt.Println("pumpUpdates error", err.Error())
+			}
 			timer.Reset(p.pollerInterval)
 
 		case <-p.ctx.Done():
@@ -102,6 +106,7 @@ func (p *longPoller) pumpUpdates() error {
 
 	for _, update := range updates {
 		if err := p.handler(update.NamespaceName); err != nil {
+			//todo handle error. err maybe overwritten
 			ret = err
 			continue
 		}
@@ -115,10 +120,14 @@ func (p *longPoller) poll() ([]*notification, error) {
 	notifications := p.notifications.toString()
 	url := notificationURL(p.conf, notifications)
 	bts, err := p.requester.request(url)
-	if err != nil || len(bts) == 0 {
+	if err != nil {
 		return nil, err
+
 	}
 	var ret []*notification
+	if len(bts) == 0 {
+		return nil, nil
+	}
 	if err := json.Unmarshal(bts, &ret); err != nil {
 		return nil, err
 	}

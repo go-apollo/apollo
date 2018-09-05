@@ -5,7 +5,7 @@ package apollo
 import "testing"
 
 func TestNotification(t *testing.T) {
-	repo := new(notificatonRepo)
+	repo := new(notificationRepo)
 
 	repo.setNotificationID("namespace", 1)
 	if id, ok := repo.getNotificationID("namespace"); !ok || id != 1 {

@@ -14,22 +14,22 @@ func TestChangeType(t *testing.T) {
 }
 
 func TestMakeDeleteChange(t *testing.T) {
-	change := makeDeleteChange("key", "val")
-	if change.ChangeType != DELETE || change.OldValue != "val" {
+	change := makeDeleteChange("key", []byte("val"))
+	if change.ChangeType != DELETE || string(change.OldValue) != "val" {
 		t.FailNow()
 	}
 }
 
 func TestMakeModifyChange(t *testing.T) {
-	change := makeModifyChange("key", "old", "new")
-	if change.ChangeType != MODIFY || change.OldValue != "old" || change.NewValue != "new" {
+	change := makeModifyChange("key", []byte("old"), []byte("new"))
+	if change.ChangeType != MODIFY || string(change.OldValue) != "old" || string(change.NewValue) != "new" {
 		t.FailNow()
 	}
 }
 
 func TestMakeAddChange(t *testing.T) {
-	change := makeAddChange("key", "value")
-	if change.ChangeType != ADD || change.NewValue != "value" {
+	change := makeAddChange("key", []byte("value"))
+	if change.ChangeType != ADD || string(change.NewValue) != "value" {
 		t.FailNow()
 	}
 }
