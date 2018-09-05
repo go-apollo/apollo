@@ -36,7 +36,7 @@ func TestCacheDump(t *testing.T) {
 	defer caches.drain()
 	caches.mustGetCache("namespace").set("key", []byte("val"))
 
-	f, err := ioutil.TempFile("/Users/liwei/chgoworkspace/apollo.v0/.", "apollo")
+	f, err := ioutil.TempFile(".", "apollo")
 	if err != nil {
 		t.Error(err)
 	}
