@@ -31,9 +31,9 @@ func (r *httpRequester) request(url string) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-
 	if resp.StatusCode == http.StatusOK {
-		return ioutil.ReadAll(resp.Body)
+		body, err := ioutil.ReadAll(resp.Body)
+		return body, err
 	}
 
 	// Discard all body if status code is not 200
