@@ -5,6 +5,7 @@ language: go
 go:
   - "1.9"
   - "1.10"
+  - "1.11"
   - master 
 
 # Skip the install step. Don't `go get` dependencies. Only build with the
@@ -44,3 +45,4 @@ script:
   - megacheck ./...                                                  # "go vet on steroids" + linter
   - gocyclo -over 19 $GO_FILES                                       # forbid code with huge functions
   - golint -set_exit_status $(go list ./...)                         # one last linter
+  - go test $(go list ./... | egrep -v '/vendor')

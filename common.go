@@ -36,7 +36,7 @@ func notificationURL(conf *Conf, notifications string) string {
 		url.QueryEscape(notifications))
 }
 
-func configURL(conf *Conf, namespace, releaseKey string) string {
+func configURL(conf *Conf, namespace string, releaseKey []byte) string {
 	return fmt.Sprintf("http://%s/configs/%s/%s/%s?releaseKey=%s&ip=%s",
 		conf.IP,
 		url.QueryEscape(conf.AppID),

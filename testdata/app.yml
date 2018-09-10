@@ -2,6 +2,6 @@ appId: SampleApp
 cluster: default
 namespaces:
 - application
-- notexist 
+- notexist
 - client.json
-ip: localhost:8080
+ip: 127.0.0.1:8080

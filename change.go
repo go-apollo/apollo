@@ -35,19 +35,19 @@ type ChangeEvent struct {
 
 // Change represent a single key change
 type Change struct {
-	OldValue   string
-	NewValue   string
+	OldValue   []byte
+	NewValue   []byte
 	ChangeType ChangeType
 }
 
-func makeDeleteChange(_, value string) *Change {
+func makeDeleteChange(_ string, value []byte) *Change {
 	return &Change{
 		ChangeType: DELETE,
 		OldValue:   value,
 	}
 }
 
-func makeModifyChange(_, oldValue, newValue string) *Change {
+func makeModifyChange(_ string, oldValue, newValue []byte) *Change {
 	return &Change{
 		ChangeType: MODIFY,
 		OldValue:   oldValue,
@@ -55,7 +55,7 @@ func makeModifyChange(_, oldValue, newValue string) *Change {
 	}
 }
 
-func makeAddChange(_, value string) *Change {
+func makeAddChange(_ string, value []byte) *Change {
 	return &Change{
 		ChangeType: ADD,
 		NewValue:   value,

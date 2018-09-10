@@ -34,15 +34,16 @@ func teardown() {
 
 func TestApolloStart(t *testing.T) {
 	if err := Start(); err == nil {
-		t.Errorf("Start with default app.properties should return err, got :%v", err)
+		t.Errorf("Start with default app.yml should return err, got :%v", err)
 	}
 
 	if err := StartWithConfFile("fake.properties"); err == nil {
 		t.Errorf("Start with fake.properties should return err, got :%v", err)
 	}
 
-	if err := StartWithConfFile("./testdata/app.properties"); err != nil {
-		t.Errorf("Start with app.properties should return nil, got :%v", err)
+	if err := StartWithConfFile("./testdata/app.yml"); err != nil {
+
+		t.Errorf("Start with app.yml should return nil, got :%v", err)
 	}
 	defer Stop()
 	defer os.Remove(defaultDumpFile)
@@ -56,7 +57,7 @@ func TestApolloStart(t *testing.T) {
 
 	select {
 	case <-updates:
-	case <-time.After(time.Millisecond * 30000):
+	case <-time.After(time.Second * 30):
 	}
 
 	val := GetStringValue("key", "defaultValue")
@@ -67,18 +68,18 @@ func TestApolloStart(t *testing.T) {
 	mockserver.Set("application", "key", "newvalue")
 	select {
 	case <-updates:
-	case <-time.After(time.Millisecond * 30000):
+	case <-time.After(time.Second * 30):
 	}
 
 	val = defaultClient.GetStringValue("key", "defaultValue")
 	if val != "newvalue" {
-		t.Errorf("GetStringValue of key should = newvalue, got %v", val)
+		t.Errorf("GetStringValue of key should = newvalue, got %s", val)
 	}
 
 	mockserver.Delete("application", "key")
 	select {
 	case <-updates:
-	case <-time.After(time.Millisecond * 30000):
+	case <-time.After(time.Second * 30):
 	}
 
 	val = GetStringValue("key", "defaultValue")
@@ -89,7 +90,7 @@ func TestApolloStart(t *testing.T) {
 	mockserver.Set("client.json", "content", `{"name":"apollo"}`)
 	select {
 	case <-updates:
-	case <-time.After(time.Millisecond * 30000):
+	case <-time.After(time.Second * 30):
 	}
 
 	val = GetNameSpaceContent("client.json", "{}")

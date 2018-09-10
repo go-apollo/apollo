@@ -10,18 +10,18 @@ import (
 func TestCache(t *testing.T) {
 	cache := newCache()
 
-	cache.set("key", "val")
-	if val, ok := cache.get("key"); !ok || val != "val" {
+	cache.set("key", []byte("val"))
+	if val, ok := cache.get("key"); !ok || string(val) != "val" {
 		t.FailNow()
 	}
 
-	cache.set("key", "val2")
-	if val, ok := cache.get("key"); !ok || val != "val2" {
+	cache.set("key", []byte("val2"))
+	if val, ok := cache.get("key"); !ok || string(val) != "val2" {
 		t.FailNow()
 	}
 
 	kv := cache.dump()
-	if len(kv) != 1 || kv["key"] != "val2" {
+	if len(kv) != 1 || string(kv["key"]) != "val2" {
 		t.FailNow()
 	}
 
@@ -32,9 +32,9 @@ func TestCache(t *testing.T) {
 }
 
 func TestCacheDump(t *testing.T) {
-	var caches = newNamespaceCahce()
+	var caches = newNamespaceCache()
 	defer caches.drain()
-	caches.mustGetCache("namespace").set("key", "val")
+	caches.mustGetCache("namespace").set("key", []byte("val"))
 
 	f, err := ioutil.TempFile(".", "apollo")
 	if err != nil {
@@ -47,13 +47,13 @@ func TestCacheDump(t *testing.T) {
 		t.Error(err)
 	}
 
-	var restore = newNamespaceCahce()
+	var restore = newNamespaceCache()
 	defer restore.drain()
 	if err := restore.load(f.Name()); err != nil {
 		t.Error(err)
 	}
 
-	if val, _ := restore.mustGetCache("namespace").get("key"); val != "val" {
+	if val, _ := restore.mustGetCache("namespace").get("key"); string(val) != "val" {
 		t.FailNow()
 	}
 
@@ -61,7 +61,7 @@ func TestCacheDump(t *testing.T) {
 		t.FailNow()
 	}
 
-	if err := restore.load("./testdata/app.properties"); err == nil {
+	if err := restore.load("./testdata/app.yml"); err == nil {
 		t.FailNow()
 	}
 }

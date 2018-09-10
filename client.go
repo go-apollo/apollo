@@ -5,6 +5,7 @@ package apollo
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -30,14 +31,14 @@ type result struct {
 	// Cluster        string            `json:"cluster"`
 	NamespaceName  string            `json:"namespaceName"`
 	Configurations map[string]string `json:"configurations"`
-	ReleaseKey     string            `json:"releaseKey"`
+	ReleaseKey     []byte            `json:"releaseKey"`
 }
 
 // NewClient create client from conf
 func NewClient(conf *Conf) *Client {
 	client := &Client{
 		conf:           conf,
-		caches:         newNamespaceCahce(),
+		caches:         newNamespaceCache(),
 		releaseKeyRepo: newCache(),
 
 		requester: newHTTPRequester(&http.Client{Timeout: queryTimeout}),
@@ -50,7 +51,6 @@ func NewClient(conf *Conf) *Client {
 
 // Start sync config
 func (c *Client) Start() error {
-
 	// preload all config to local first
 	if err := c.preload(); err != nil {
 		return err
@@ -65,10 +65,14 @@ func (c *Client) Start() error {
 // handleNamespaceUpdate sync config for namespace, delivery changes to subscriber
 func (c *Client) handleNamespaceUpdate(namespace string) error {
 	change, err := c.sync(namespace)
-	if err != nil || change == nil {
-		return err
+	if err != nil {
+		return fmt.Errorf("handling namespace not updated %s", err)
 	}
-
+	//don't delivery change event if namespace has any change
+	if change == nil {
+		return nil
+	}
+	//delivery change event if namespace has changed
 	c.deliveryChangeEvent(change)
 	return nil
 }
@@ -82,7 +86,7 @@ func (c *Client) Stop() error {
 	return nil
 }
 
-// fetchAllCinfig fetch from remote, if failed load from local file
+// fetchAllConfig fetch from remote, if failed load from local file
 func (c *Client) preload() error {
 	if err := c.longPoller.preload(); err != nil {
 		return c.loadLocal(defaultDumpFile)
@@ -112,32 +116,33 @@ func (c *Client) mustGetCache(namespace string) *cache {
 	return c.caches.mustGetCache(namespace)
 }
 
-// GetStringValueWithNameSapce get value from given namespace
-func (c *Client) GetStringValueWithNameSapce(namespace, key, defaultValue string) string {
+// GetStringValueWithNameSpace get value from given namespace
+func (c *Client) GetStringValueWithNameSpace(namespace, key, defaultValue string) string {
 	cache := c.mustGetCache(namespace)
-	if ret, ok := cache.get(key); ok && ret != "" {
-		return ret
+	//fmt.Printf("cache: ns:%s key: %s isOk: %v val %+v\n", namespace, key, ok, ret)
+	if ret, ok := cache.get(key); ok {
+		return string(ret)
 	}
 	return defaultValue
 }
 
 // GetStringValue from default namespace
 func (c *Client) GetStringValue(key, defaultValue string) string {
-	return c.GetStringValueWithNameSapce(defaultNamespace, key, defaultValue)
+	return c.GetStringValueWithNameSpace(defaultNamespace, key, defaultValue)
 }
 
 // GetNameSpaceContent get contents of namespace
 func (c *Client) GetNameSpaceContent(namespace, defaultValue string) string {
-	return c.GetStringValueWithNameSapce(namespace, "content", defaultValue)
+	return c.GetStringValueWithNameSpace(namespace, "content", defaultValue)
 }
 
 // sync namespace config
-func (c *Client) sync(namesapce string) (*ChangeEvent, error) {
-	releaseKey := c.getReleaseKey(namesapce)
-	url := configURL(c.conf, namesapce, releaseKey)
+func (c *Client) sync(namespace string) (*ChangeEvent, error) {
+	releaseKey := c.getReleaseKey(namespace)
+	url := configURL(c.conf, namespace, releaseKey)
 	bts, err := c.requester.request(url)
 	if err != nil || len(bts) == 0 {
-		return nil, err
+		return nil, fmt.Errorf("sync namespace config error, remote error or empty congfig")
 	}
 	var result result
 	if err := json.Unmarshal(bts, &result); err != nil {
@@ -167,7 +172,6 @@ func (c *Client) handleResult(result *result) *ChangeEvent {
 
 	cache := c.mustGetCache(result.NamespaceName)
 	kv := cache.dump()
-
 	for k, v := range kv {
 		if _, ok := result.Configurations[k]; !ok {
 			cache.delete(k)
@@ -176,14 +180,14 @@ func (c *Client) handleResult(result *result) *ChangeEvent {
 	}
 
 	for k, v := range result.Configurations {
-		cache.set(k, v)
+		cache.set(k, []byte(v))
 		old, ok := kv[k]
 		if !ok {
-			ret.Changes[k] = makeAddChange(k, v)
+			ret.Changes[k] = makeAddChange(k, []byte(v))
 			continue
 		}
-		if old != v {
-			ret.Changes[k] = makeModifyChange(k, old, v)
+		if string(old) != string(v) {
+			ret.Changes[k] = makeModifyChange(k, old, []byte(v))
 		}
 	}
 
@@ -199,11 +203,11 @@ func (c *Client) handleResult(result *result) *ChangeEvent {
 	return &ret
 }
 
-func (c *Client) getReleaseKey(namespace string) string {
+func (c *Client) getReleaseKey(namespace string) []byte {
 	releaseKey, _ := c.releaseKeyRepo.get(namespace)
 	return releaseKey
 }
 
-func (c *Client) setReleaseKey(namespace, releaseKey string) {
+func (c *Client) setReleaseKey(namespace string, releaseKey []byte) {
 	c.releaseKeyRepo.set(namespace, releaseKey)
 }
