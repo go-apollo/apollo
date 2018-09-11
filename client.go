@@ -31,7 +31,7 @@ type result struct {
 	// Cluster        string            `json:"cluster"`
 	NamespaceName  string            `json:"namespaceName"`
 	Configurations map[string]string `json:"configurations"`
-	ReleaseKey     []byte            `json:"releaseKey"`
+	ReleaseKey     string            `json:"releaseKey"`
 }
 
 // NewClient create client from conf
@@ -89,6 +89,7 @@ func (c *Client) Stop() error {
 // fetchAllConfig fetch from remote, if failed load from local file
 func (c *Client) preload() error {
 	if err := c.longPoller.preload(); err != nil {
+		fmt.Println("ERR:", err)
 		return c.loadLocal(defaultDumpFile)
 	}
 	return nil
@@ -119,7 +120,6 @@ func (c *Client) mustGetCache(namespace string) *cache {
 // GetStringValueWithNameSpace get value from given namespace
 func (c *Client) GetStringValueWithNameSpace(namespace, key, defaultValue string) string {
 	cache := c.mustGetCache(namespace)
-	//fmt.Printf("cache: ns:%s key: %s isOk: %v val %+v\n", namespace, key, ok, ret)
 	if ret, ok := cache.get(key); ok {
 		return string(ret)
 	}
@@ -139,7 +139,7 @@ func (c *Client) GetNameSpaceContent(namespace, defaultValue string) string {
 // sync namespace config
 func (c *Client) sync(namespace string) (*ChangeEvent, error) {
 	releaseKey := c.getReleaseKey(namespace)
-	url := configURL(c.conf, namespace, releaseKey)
+	url := configURL(c.conf, namespace, string(releaseKey))
 	bts, err := c.requester.request(url)
 	if err != nil || len(bts) == 0 {
 		return nil, fmt.Errorf("sync namespace config error, remote error or empty congfig")
@@ -191,7 +191,7 @@ func (c *Client) handleResult(result *result) *ChangeEvent {
 		}
 	}
 
-	c.setReleaseKey(result.NamespaceName, result.ReleaseKey)
+	c.setReleaseKey(result.NamespaceName, []byte(result.ReleaseKey))
 
 	// dump caches to file
 	c.dump(defaultDumpFile)
