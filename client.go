@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"gopkg.in/logger.v1"
 )
 
 // Client for apollo
@@ -89,7 +91,7 @@ func (c *Client) Stop() error {
 // fetchAllConfig fetch from remote, if failed load from local file
 func (c *Client) preload() error {
 	if err := c.longPoller.preload(); err != nil {
-		fmt.Println("ERR:", err)
+		log.Errorf("fetchAllConfig fetch from remote: %s", err)
 		return c.loadLocal(defaultDumpFile)
 	}
 	return nil
@@ -97,6 +99,7 @@ func (c *Client) preload() error {
 
 // loadLocal load caches from local file
 func (c *Client) loadLocal(name string) error {
+	log.Debugf("loadLocal load caches from local file,file name: %s", name)
 	return c.caches.load(name)
 }
 
@@ -119,8 +122,10 @@ func (c *Client) mustGetCache(namespace string) *cache {
 
 // GetStringValueWithNameSpace get value from given namespace
 func (c *Client) GetStringValueWithNameSpace(namespace, key, defaultValue string) string {
+	log.Debugf("GetStringValueWithNameSpace get value from given namespace,namespace: %s,key: %s, defaultValue: %s", namespace, key, defaultValue)
 	cache := c.mustGetCache(namespace)
 	if ret, ok := cache.get(key); ok {
+		log.Debugf("GetStringValueWithNameSpace from cache result:\nret: %s \nisOk: %t", ret, ok)
 		return string(ret)
 	}
 	return defaultValue

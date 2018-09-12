@@ -6,6 +6,8 @@ import (
 	"encoding/gob"
 	"os"
 	"sync"
+
+	"gopkg.in/logger.v1"
 )
 
 type namespaceCache struct {
@@ -63,6 +65,7 @@ func (n *namespaceCache) load(name string) error {
 
 	f, err := os.OpenFile(name, os.O_RDONLY, 0755)
 	if err != nil {
+		log.Errorf("Open file error: %s", err)
 		return err
 	}
 	defer f.Close()
@@ -70,6 +73,7 @@ func (n *namespaceCache) load(name string) error {
 	var dumps = map[string]map[string][]byte{}
 
 	if err := gob.NewDecoder(f).Decode(&dumps); err != nil {
+		log.Errorf("file decoder error: %s", err)
 		return err
 	}
 
