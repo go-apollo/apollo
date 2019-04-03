@@ -43,7 +43,7 @@ before_script:
 script:
   - test -z $(gofmt -s -l $GO_FILES)                                 # Fail if a .go file hasn't been formatted with gofmt
   - go vet ./...                                                     # go vet is the official Go static analyzer
-  - staticcheck ./...                                                  # "go vet on steroids" + linter
+  - staticcheck -go 1.11 ./...                                                  # "go vet on steroids" + linter
   - gocyclo -over 19 $GO_FILES                                       # forbid code with huge functions
   - golint -set_exit_status $(go list ./...)                         # one last linter
   - go test $(go list ./... | egrep -v '/vendor')
