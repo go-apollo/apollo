@@ -3,11 +3,12 @@
 package apollo
 
 import (
-	"apollo/internal/mockserver"
 	"log"
 	"os"
 	"testing"
 	"time"
+
+	"gopkg.in/apollo.v0/internal/mockserver"
 )
 
 func TestMain(m *testing.M) {

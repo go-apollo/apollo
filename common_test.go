@@ -33,7 +33,7 @@ func TestConfigURL(t *testing.T) {
 			IP:      "127.0.0.1:8080",
 			AppID:   "SampleApp",
 			Cluster: "default",
-		}, "application", string(""))
+		}, "application", "")
 	_, err := url.Parse(target)
 	if err != nil {
 		t.Error(err)
