@@ -32,6 +32,7 @@ before_script:
   - echo $TRAVIS_BUILD_DIR
   - mv $TRAVIS_BUILD_DIR $HOME/gopath/src/gopkg.in/apollo.v0
   - export TRAVIS_BUILD_DIR=$HOME/gopath/src/gopkg.in/apollo.v0
+  - export GO111MODULE=off
   - GO_FILES=$(find . -iname '*.go' -type f | egrep -v '/vendor') # All the .go files, excluding vendor/
   - go get -u github.com/golang/lint/golint                                   # Linter
   - go get -u honnef.co/go/tools/cmd/staticcheck
