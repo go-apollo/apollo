@@ -2,26 +2,31 @@
 
 package apollo
 
-import "testing"
+import (
+	"github.com/stretchr/testify/suite"
+)
 
-func TestNotification(t *testing.T) {
+type NotificationTestSuite struct {
+	suite.Suite
+}
+
+func (s *NotificationTestSuite) TestNotification() {
 	repo := new(notificationRepo)
 
 	repo.setNotificationID("namespace", 1)
-	if id, ok := repo.getNotificationID("namespace"); !ok || id != 1 {
-		t.FailNow()
-	}
-
+	id, ok := repo.getNotificationID("namespace")
+	s.True(ok)
+	s.Equal(1, id)
 	repo.setNotificationID("namespace", 2)
-	if id, ok := repo.getNotificationID("namespace"); !ok || id != 2 {
-		t.FailNow()
-	}
+	id2, ok2 := repo.getNotificationID("namespace")
+	s.True(ok2)
+	s.Equal(2, id2)
 
-	if id, ok := repo.getNotificationID("null"); ok || id != defaultNotificationID {
-		t.FailNow()
-	}
+	id3, ok3 := repo.getNotificationID("null")
 
-	if str := repo.toString(); str == "" {
-		t.FailNow()
-	}
+	s.False(ok3)
+	s.Equal(defaultNotificationID, id3)
+
+	str := repo.toString()
+	s.NotEmpty(str)
 }

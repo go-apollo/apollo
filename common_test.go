@@ -4,17 +4,20 @@ package apollo
 
 import (
 	"net/url"
-	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
-func TestLocalIp(t *testing.T) {
-	ip := getLocalIP()
-	if ip == "" {
-		t.FailNow()
-	}
+type CommonTestSuite struct {
+	suite.Suite
 }
 
-func TestNotificationURL(t *testing.T) {
+func (s *CommonTestSuite) TestLocalIp() {
+	ip := getLocalIP()
+	s.NotEmpty(ip)
+}
+
+func (s *CommonTestSuite) TestNotificationURL() {
 	target := notificationURL(
 		&Conf{
 			IP:      "127.0.0.1:8080",
@@ -22,12 +25,10 @@ func TestNotificationURL(t *testing.T) {
 			Cluster: "default",
 		}, "")
 	_, err := url.Parse(target)
-	if err != nil {
-		t.Error(err)
-	}
+	s.NoError(err)
 }
 
-func TestConfigURL(t *testing.T) {
+func (s *CommonTestSuite) TestConfigURL() {
 	target := configURL(
 		&Conf{
 			IP:      "127.0.0.1:8080",
@@ -35,7 +36,5 @@ func TestConfigURL(t *testing.T) {
 			Cluster: "default",
 		}, "application", "")
 	_, err := url.Parse(target)
-	if err != nil {
-		t.Error(err)
-	}
+	s.NoError(err)
 }

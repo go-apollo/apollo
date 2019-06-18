@@ -5,25 +5,27 @@ package apollo
 import (
 	"log"
 	"os"
+	"testing"
 	"time"
 
 	// "time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+
 	"gopkg.in/apollo.v0/internal/mockserver"
 )
 
 type StartWithConfTestSuite struct {
 	suite.Suite
 	changeEvent <-chan *ChangeEvent
-	// updates = WatchUpdate()
-	// apollo *Client
-	// VariableThatShouldStartAtFive int
 }
 
-func (s *StartWithConfTestSuite) SetupTest() {
-
+func (s *StartWithConfTestSuite) SetupSuite() {
+	startMockServer()
+	startTestApollo()
+	s.changeEvent = WatchUpdate()
+}
+func startTestApollo() {
 	if err := StartWithConfFile("./testdata/app.yml"); err != nil {
 		log.Fatalf("Start with app.yml should return nil, got :%v", err)
 	}
@@ -32,54 +34,49 @@ func (s *StartWithConfTestSuite) SetupTest() {
 	if err := defaultClient.loadLocal(defaultDumpFile); err != nil {
 		log.Fatalf("loadLocal should return nil, got: %v", err)
 	}
-
-	s.changeEvent = WatchUpdate()
-
-	// s.apollo = defaultClient
 }
-func (s *StartWithConfTestSuite) TearDownTest() {
+func (s *StartWithConfTestSuite) BeforeTest(suiteName, testName string) {
+	// log.Println("suiteName: " + suiteName)
+	// log.Println("testName: " + testName)
+}
+func (s *StartWithConfTestSuite) TearDownSuite() {
 	Stop()
-	defer os.Remove(defaultDumpFile)
+	os.Remove(defaultDumpFile)
+	time.Sleep(5 * time.Second)
+	mockserver.Close()
 }
-func (s *StartWithConfTestSuite) LoadLocal() {
+func (s *StartWithConfTestSuite) TestLoadLocal() {
 	err := defaultClient.loadLocal(defaultDumpFile)
-	assert.NoError(s.T(), err)
+	s.NoError(err)
 }
-func (s *StartWithConfTestSuite) BeforeGetStringValueWithNameSpace() {
+
+func (s *StartWithConfTestSuite) TestGetStringValueWithNameSpace() {
 	mockserver.Set("application", "key", "value")
 	s.wait()
-}
-func (s *StartWithConfTestSuite) GetStringValueWithNameSpace() {
 	val := GetStringValueWithNameSpace("application", "key", "defaultValue")
-	assert.Equal(s.T(), "value", val)
-}
-func (s *StartWithConfTestSuite) BeforeGetStringValue() {
-	mockserver.Set("application", "key", "newvalue")
-	s.wait()
-}
-func (s *StartWithConfTestSuite) GetStringValue() {
-	val := GetIntValue("intkey", 0)
-	assert.Equal(s.T(), 1, val)
+	s.Equal("value", val)
 }
 
-func (s *StartWithConfTestSuite) BeforeGetIntValue() {
+func (s *StartWithConfTestSuite) TestGetStringValue() {
 	mockserver.Set("application", "key", "newvalue")
 	s.wait()
-}
-func (s *StartWithConfTestSuite) GetIntValue() {
 	val := GetStringValue("key", "defaultValue")
-	assert.Equal(s.T(), "newvalue", val)
+	s.Equal("newvalue", val)
 }
 
-func (s *StartWithConfTestSuite) BeforeGetNameSpaceContent() {
+func (s *StartWithConfTestSuite) TestGetIntValue() {
+	mockserver.Set("application", "intkey", "1")
+	s.wait()
+	val := GetIntValue("intkey", 0)
+	s.Equal(1, val)
+}
+func (s *StartWithConfTestSuite) TestGetNameSpaceContent() {
 
 	mockserver.Set("client.json", "content", `{"name":"apollo"}`)
 	s.wait()
-}
-func (s *StartWithConfTestSuite) GetNameSpaceContent() {
 
 	val := GetNameSpaceContent("client.json", "{}")
-	assert.Equal(s.T(), `{"name":"apollo"}`, val)
+	s.Equal(`{"name":"apollo"}`, val)
 }
 
 func (s *StartWithConfTestSuite) wait() {
@@ -87,4 +84,47 @@ func (s *StartWithConfTestSuite) wait() {
 	case <-s.changeEvent:
 	case <-time.After(time.Second * 30):
 	}
+}
+func startMockServer() {
+	go func() {
+		if err := mockserver.Run(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+	// wait for mock server to run
+	time.Sleep(time.Millisecond * 10)
+}
+
+func (s *StartWithConfTestSuite) TestRunCacheSuite() {
+
+	cs := new(CacheTestSuite)
+	cs.SetT(s.T())
+	s.Run("TestCache", cs.TestCache)
+	s.Run("TestCacheDump", cs.TestCacheDump)
+}
+
+func (s *StartWithConfTestSuite) TestRunNotificationSuite() {
+
+	ns := new(NotificationTestSuite)
+	ns.SetT(s.T())
+	s.Run("TestNotification", ns.TestNotification)
+}
+func (s *StartWithConfTestSuite) TestRunCommonSuite() {
+
+	cs := new(CommonTestSuite)
+	cs.SetT(s.T())
+	s.Run("TestLocalIp", cs.TestLocalIp)
+	s.Run("TestConfigURL", cs.TestConfigURL)
+	s.Run("TestNotificationURL", cs.TestNotificationURL)
+}
+func (s *StartWithConfTestSuite) TestRunChangeSuite() {
+	cs := new(ChangeTestSuite)
+	cs.SetT(s.T())
+	s.Run("TestCache", cs.TestChangeType)
+	s.Run("TestMakeAddChange", cs.TestMakeAddChange)
+	s.Run("TestMakeModifyChange", cs.TestMakeModifyChange)
+	s.Run("TestMakeDeleteChange", cs.TestMakeDeleteChange)
+}
+func TestRunSuite(t *testing.T) {
+	suite.Run(t, new(StartWithConfTestSuite))
 }
