@@ -16,7 +16,7 @@ The goal of this project is to make the easiest way of using Ctrip apollo for go
 
 ## Required
 
-**go 1.9** or later
+**go 1.10** or later
 
 ## Installation
 
