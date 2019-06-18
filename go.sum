@@ -11,3 +11,5 @@ gopkg.in/logger.v1 v1.0.1 h1:9icQ68EIU1UkD1k0l/vnokOvbtNM11V6f73+/NdPnfM=
 gopkg.in/logger.v1 v1.0.1/go.mod h1:HxIq/YRWNOsNazORTgNrNHFJ15sSREEJH9HL0Oz5x1k=
 gopkg.in/yaml.v2 v2.2.1 h1:mUhvW9EsL+naU5Q3cakzfE91YhliOondGd6ZrsDBHQE=
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
+gopkg.in/yaml.v3 v3.0.0-20190502103701-55513cacd4ae h1:ehhBuCxzgQEGk38YjhFv/97fMIc2JGHZAhAWMmEjmu0=
+gopkg.in/yaml.v3 v3.0.0-20190502103701-55513cacd4ae/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=

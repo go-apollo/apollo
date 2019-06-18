@@ -1,0 +1,60 @@
+---
+kind: pipeline
+name: go-1-10
+workspace:
+  base: /go
+  path: src/gopkg.in/apollo.v0
+steps:
+- name: test
+  image: golang:1.10
+  commands:
+  - GO_FILES=$(find . -iname '*.go' -type f | egrep -v '/vendor') # All the .go files, excluding vendor/
+  - go get -u golang.org/x/lint/golint                                # Linter
+  - go get github.com/fzipp/gocyclo
+  - go get -u github.com/golang/dep/cmd/dep
+  - dep init
+  - dep ensure
+  - test -z $(gofmt -s -l $GO_FILES)                                 # Fail if a .go file hasn't been formatted with gofmt
+  - go vet ./...                                                     # go vet is the official Go static analyzer
+  - gocyclo -over 19 $GO_FILES                                       # forbid code with huge functions
+  - golint -set_exit_status $(go list ./...)                         # one last linter
+  - go test -v $(go list ./... | egrep -v '/vendor')
+
+---
+kind: pipeline
+name: go-1-11
+
+steps:
+- name: test
+  image: golang:1.11
+  commands:
+  - GO_FILES=$(find . -iname '*.go' -type f | egrep -v '/vendor') # All the .go files, excluding vendor/
+  - go get -u golang.org/x/lint/golint                                # Linter
+  - go get -u honnef.co/go/tools/cmd/staticcheck
+  - go get github.com/fzipp/gocyclo
+  - go mod download
+  - test -z $(gofmt -s -l $GO_FILES)                                 # Fail if a .go file hasn't been formatted with gofmt
+  - go vet ./...                                                     # go vet is the official Go static analyzer
+  - staticcheck ./...                                                  # "go vet on steroids" + linter
+  - gocyclo -over 19 $GO_FILES                                       # forbid code with huge functions
+  - golint -set_exit_status $(go list ./...)                         # one last linter
+  - go test -v $(go list ./... | egrep -v '/vendor')
+---
+kind: pipeline
+name: go-1-12
+
+steps:
+- name: test
+  image: golang:1.12
+  commands:
+  - GO_FILES=$(find . -iname '*.go' -type f | egrep -v '/vendor') # All the .go files, excluding vendor/
+  - go get -u golang.org/x/lint/golint                                # Linter
+  - go get -u honnef.co/go/tools/cmd/staticcheck
+  - go get github.com/fzipp/gocyclo
+  - go get
+  - test -z $(gofmt -s -l $GO_FILES)                                 # Fail if a .go file hasn't been formatted with gofmt
+  - go vet ./...                                                     # go vet is the official Go static analyzer
+  - staticcheck ./...                                                  # "go vet on steroids" + linter
+  - gocyclo -over 19 $GO_FILES                                       # forbid code with huge functions
+  - golint -set_exit_status $(go list ./...)                         # one last linter
+  - go test -v $(go list ./... | egrep -v '/vendor')
