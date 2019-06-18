@@ -97,4 +97,15 @@ func TestApolloStart(t *testing.T) {
 	if val != `{"name":"apollo"}` {
 		t.Errorf(`GetStringValue of client.json content should  = {"name":"apollo"}, got %v`, val)
 	}
+
+	mockserver.Set("application", "intkey", "1")
+	select {
+	case <-updates:
+	case <-time.After(time.Second * 30):
+	}
+	intv := GetIntValue("intkey", 0)
+	if intv != 1 {
+		t.Errorf("GetIntValue of client content should == 1, got %d", intv)
+	}
+
 }

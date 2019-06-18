@@ -51,6 +51,11 @@ func GetStringValue(key, defaultValue string) string {
 	return GetStringValueWithNameSpace(defaultNamespace, key, defaultValue)
 }
 
+// GetIntValue from default namespace
+func GetIntValue(key string, defaultValue int) int {
+	return defaultClient.GetIntValue(key, defaultValue)
+}
+
 // GetNameSpaceContent get contents of namespace
 func GetNameSpaceContent(namespace, defaultValue string) string {
 	return defaultClient.GetNameSpaceContent(namespace, defaultValue)

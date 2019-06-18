@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"gopkg.in/logger.v1"
 )
@@ -131,9 +132,25 @@ func (c *Client) GetStringValueWithNameSpace(namespace, key, defaultValue string
 	return defaultValue
 }
 
+// GetIntValueWithNameSpace get int value from given namespace
+func (c *Client) GetIntValueWithNameSpace(namespace, key string, defaultValue int) int {
+	sValue := GetStringValueWithNameSpace(namespace, key, "")
+	intValue, err := strconv.Atoi(sValue)
+	if err != nil {
+		log.Errorf("GetIntValue %s err: %s", key, err.Error())
+		return defaultValue
+	}
+	return intValue
+}
+
 // GetStringValue from default namespace
 func (c *Client) GetStringValue(key, defaultValue string) string {
 	return c.GetStringValueWithNameSpace(defaultNamespace, key, defaultValue)
+}
+
+// GetIntValue from default namespace
+func (c *Client) GetIntValue(key string, defaultValue int) int {
+	return c.GetIntValueWithNameSpace(defaultNamespace, key, defaultValue)
 }
 
 // GetNameSpaceContent get contents of namespace
