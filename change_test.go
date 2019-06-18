@@ -1,35 +1,44 @@
 //Copyright (c) 2017 Phil
 package apollo
 
-import "testing"
+import (
+	"testing"
 
-func TestChangeType(t *testing.T) {
+	"github.com/stretchr/testify/suite"
+)
+
+type ChangeTestSuite struct {
+	suite.Suite
+}
+
+func (s *ChangeTestSuite) TestChangeType() {
 	var tps = []ChangeType{ADD, MODIFY, DELETE, ChangeType(-1)}
 	var strs = []string{"ADD", "MODIFY", "DELETE", "UNKNOW"}
 	for i, tp := range tps {
-		if tp.String() != strs[i] {
-			t.FailNow()
-		}
+		s.True(tp.String() == strs[i])
 	}
 }
 
-func TestMakeDeleteChange(t *testing.T) {
+func (s *ChangeTestSuite) TestMakeDeleteChange() {
 	change := makeDeleteChange("key", []byte("val"))
-	if change.ChangeType != DELETE || string(change.OldValue) != "val" {
-		t.FailNow()
-	}
+	s.True(change.ChangeType == DELETE)
+	s.True(string(change.OldValue) == "val")
 }
 
-func TestMakeModifyChange(t *testing.T) {
+func (s *ChangeTestSuite) TestMakeModifyChange() {
 	change := makeModifyChange("key", []byte("old"), []byte("new"))
-	if change.ChangeType != MODIFY || string(change.OldValue) != "old" || string(change.NewValue) != "new" {
-		t.FailNow()
-	}
+	s.True(change.ChangeType == MODIFY)
+	s.True(string(change.OldValue) == "old")
+	s.True(string(change.NewValue) == "new")
 }
 
-func TestMakeAddChange(t *testing.T) {
+func (s *ChangeTestSuite) TestMakeAddChange() {
 	change := makeAddChange("key", []byte("value"))
-	if change.ChangeType != ADD || string(change.NewValue) != "value" {
-		t.FailNow()
-	}
+	s.True(change.ChangeType == ADD)
+	s.True(string(change.NewValue) == "value")
+
+}
+
+func TestRunChangeSuite(t *testing.T) {
+	suite.Run(t, new(ChangeTestSuite))
 }

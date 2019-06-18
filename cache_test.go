@@ -5,63 +5,66 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
 )
 
-func TestCache(t *testing.T) {
+type CacheTestSuite struct {
+	suite.Suite
+}
+
+func (s *CacheTestSuite) TestCache() {
 	cache := newCache()
 
 	cache.set("key", []byte("val"))
-	if val, ok := cache.get("key"); !ok || string(val) != "val" {
-		t.FailNow()
-	}
+	val, ok := cache.get("key")
+
+	s.True(ok)
+	s.Equal("val", string(val))
 
 	cache.set("key", []byte("val2"))
-	if val, ok := cache.get("key"); !ok || string(val) != "val2" {
-		t.FailNow()
-	}
+	val1, ok1 := cache.get("key")
+
+	s.True(ok1)
+	s.Equal("val2", string(val1))
 
 	kv := cache.dump()
-	if len(kv) != 1 || string(kv["key"]) != "val2" {
-		t.FailNow()
-	}
+
+	s.Equal(1, len(kv))
+	s.Equal("val2", string(kv["key"]))
 
 	cache.delete("key")
-	if _, ok := cache.get("key"); ok {
-		t.FailNow()
-	}
+	_, ok2 := cache.get("key")
+	s.False(ok2)
 }
 
-func TestCacheDump(t *testing.T) {
+func (s *CacheTestSuite) TestCacheDump() {
 	var caches = newNamespaceCache()
 	defer caches.drain()
+
 	caches.mustGetCache("namespace").set("key", []byte("val"))
 
 	f, err := ioutil.TempFile(".", "apollo")
-	if err != nil {
-		t.Error(err)
-	}
+	s.NoError(err)
 	f.Close()
 	defer os.Remove(f.Name())
 
-	if err := caches.dump(f.Name()); err != nil {
-		t.Error(err)
-	}
+	s.NoError(caches.dump(f.Name()))
 
 	var restore = newNamespaceCache()
 	defer restore.drain()
-	if err := restore.load(f.Name()); err != nil {
-		t.Error(err)
-	}
 
-	if val, _ := restore.mustGetCache("namespace").get("key"); string(val) != "val" {
-		t.FailNow()
-	}
+	s.NoError(restore.load(f.Name()))
 
-	if err := restore.load("null"); err == nil {
-		t.FailNow()
-	}
+	val, _ := restore.mustGetCache("namespace").get("key")
 
-	if err := restore.load("./testdata/app.yml"); err == nil {
-		t.FailNow()
-	}
+	s.Equal("val", string(val))
+
+	s.Error(restore.load("null"))
+
+	s.Error(restore.load("./testdata/app.yml"))
+}
+
+func TestRunCacheSuite(t *testing.T) {
+	suite.Run(t, new(CacheTestSuite))
 }

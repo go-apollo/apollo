@@ -8,17 +8,79 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/suite"
+
 	"gopkg.in/apollo.v0/internal/mockserver"
 )
 
-func TestMain(m *testing.M) {
-	setup()
-	code := m.Run()
-	teardown()
-	os.Exit(code)
+type StartWithConfTestSuite struct {
+	suite.Suite
+	changeEvent <-chan *ChangeEvent
 }
 
-func setup() {
+func (s *StartWithConfTestSuite) SetupSuite() {
+	startTestApollo()
+	s.changeEvent = WatchUpdate()
+}
+func startTestApollo() {
+	if err := StartWithConfFile("./testdata/app.yml"); err != nil {
+		log.Fatalf("Start with app.yml should return nil, got :%v", err)
+	}
+	// defer Stop()
+
+	if err := defaultClient.loadLocal(defaultDumpFile); err != nil {
+		log.Fatalf("loadLocal should return nil, got: %v", err)
+	}
+}
+func (s *StartWithConfTestSuite) BeforeTest(suiteName, testName string) {
+	// log.Println("suiteName: " + suiteName)
+	// log.Println("testName: " + testName)
+}
+func (s *StartWithConfTestSuite) TearDownSuite() {
+	s.NoError(Stop())
+	os.Remove(defaultDumpFile)
+}
+func (s *StartWithConfTestSuite) TestLoadLocal() {
+	err := defaultClient.loadLocal(defaultDumpFile)
+	s.NoError(err)
+}
+
+func (s *StartWithConfTestSuite) TestGetStringValueWithNameSpace() {
+	mockserver.Set("application", "key", "value")
+	s.wait()
+	val := GetStringValueWithNameSpace("application", "key", "defaultValue")
+	s.Equal("value", val)
+}
+
+func (s *StartWithConfTestSuite) TestGetStringValue() {
+	mockserver.Set("application", "key", "newvalue")
+	s.wait()
+	val := GetStringValue("key", "defaultValue")
+	s.Equal("newvalue", val)
+}
+
+func (s *StartWithConfTestSuite) TestGetIntValue() {
+	mockserver.Set("application", "intkey", "1")
+	s.wait()
+	val := GetIntValue("intkey", 0)
+	s.Equal(1, val)
+}
+func (s *StartWithConfTestSuite) TestGetNameSpaceContent() {
+
+	mockserver.Set("client.json", "content", `{"name":"apollo"}`)
+	s.wait()
+
+	val := GetNameSpaceContent("client.json", "{}")
+	s.Equal(`{"name":"apollo"}`, val)
+}
+
+func (s *StartWithConfTestSuite) wait() {
+	select {
+	case <-s.changeEvent:
+	case <-time.After(time.Second * 30):
+	}
+}
+func startMockServer() {
 	go func() {
 		if err := mockserver.Run(); err != nil {
 			log.Fatal(err)
@@ -28,84 +90,18 @@ func setup() {
 	time.Sleep(time.Millisecond * 10)
 }
 
-func teardown() {
-	mockserver.Close()
+func TestRunSuite(t *testing.T) {
+	suite.Run(t, new(StartWithConfTestSuite))
 }
-
-func TestApolloStart(t *testing.T) {
-	if err := Start(); err == nil {
-		t.Errorf("Start with default app.yml should return err, got :%v", err)
-	}
-
-	if err := StartWithConfFile("fake.properties"); err == nil {
-		t.Errorf("Start with fake.properties should return err, got :%v", err)
-	}
-
-	if err := StartWithConfFile("./testdata/app.yml"); err != nil {
-
-		t.Errorf("Start with app.yml should return nil, got :%v", err)
-	}
-	defer Stop()
-	defer os.Remove(defaultDumpFile)
-
-	if err := defaultClient.loadLocal(defaultDumpFile); err != nil {
-		t.Errorf("loadLocal should return nil, got: %v", err)
-	}
-
-	mockserver.Set("application", "key", "value")
-	updates := WatchUpdate()
-
-	select {
-	case <-updates:
-	case <-time.After(time.Second * 30):
-	}
-
-	val := GetStringValue("key", "defaultValue")
-	if val != "value" {
-		t.Errorf("GetStringValue of key should = value, got %v", val)
-	}
-
-	mockserver.Set("application", "key", "newvalue")
-	select {
-	case <-updates:
-	case <-time.After(time.Second * 30):
-	}
-
-	val = defaultClient.GetStringValue("key", "defaultValue")
-	if val != "newvalue" {
-		t.Errorf("GetStringValue of key should = newvalue, got %s", val)
-	}
-
-	mockserver.Delete("application", "key")
-	select {
-	case <-updates:
-	case <-time.After(time.Second * 30):
-	}
-
-	val = GetStringValue("key", "defaultValue")
-	if val != "defaultValue" {
-		t.Errorf("GetStringValue of key should = defaultValue, got %v", val)
-	}
-
-	mockserver.Set("client.json", "content", `{"name":"apollo"}`)
-	select {
-	case <-updates:
-	case <-time.After(time.Second * 30):
-	}
-
-	val = GetNameSpaceContent("client.json", "{}")
-	if val != `{"name":"apollo"}` {
-		t.Errorf(`GetStringValue of client.json content should  = {"name":"apollo"}, got %v`, val)
-	}
-
-	mockserver.Set("application", "intkey", "1")
-	select {
-	case <-updates:
-	case <-time.After(time.Second * 30):
-	}
-	intv := GetIntValue("intkey", 0)
-	if intv != 1 {
-		t.Errorf("GetIntValue of client content should == 1, got %d", intv)
-	}
-
+func TestMain(m *testing.M) {
+	setup()
+	code := m.Run()
+	tearDown()
+	os.Exit(code)
+}
+func setup() {
+	startMockServer()
+}
+func tearDown() {
+	mockserver.Close()
 }
