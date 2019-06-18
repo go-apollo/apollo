@@ -22,14 +22,6 @@ Fork -> Patch -> Push -> Pull Request
 
 **go 1.10** or later
 
-## Installation
-
-```sh
-    go get -u gopkg.in/apollo.v0
-    //if you use dep as your golang dep tool
-    dep ensure -add  gopkg.in/apollo.v0
-```
-
 ## Build
 If you want build this project,should use go 1.11+
 ```
@@ -38,11 +30,17 @@ GO111MODULE=on; go mod download
 ```
 
 ## Usage
+### Installation
+```bash
+# go mod (only go 1.11+) or project in gopath(go 1.10 +)
+go get -u gopkg.in/apollo.v0
+# if you use dep as your golang dep tool (go 1.10)
+dep ensure -add  gopkg.in/apollo.v0
 
-### Set custom logger
+### Set custom logger(Optional)
 go-apoll use gopkg.in/logger.v1 as default logger provider.
 Any logger implemented apollo.Logger interface can be use as apollo logger provider(such as [logrus](https://github.com/sirupsen/logrus)).
-```go
+```golang
 //Logger interface
 type Logger interface {
 	Warnf(format string, v ...interface{})
@@ -58,7 +56,7 @@ type Logger interface {
 }
 ```
 set logrus as log provider
-```go
+```golang
 var log = logrus.New()
 log.Formatter = new(logrus.JSONFormatter)
 log.Formatter = new(logrus.TextFormatter)                     //default
