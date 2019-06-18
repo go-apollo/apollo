@@ -16,7 +16,7 @@ The goal of this project is to make the easiest way of using Ctrip apollo for go
 
 ## Required
 
-**go 1.10** or later
+**go 1.11** or later
 
 ## Installation
 
@@ -27,7 +27,7 @@ The goal of this project is to make the easiest way of using Ctrip apollo for go
 ```
 
 ## Build
-If you want build this project,should use go 1.11
+If you want build this project,should use go 1.11+
 ```
 GO111MODULE=on; go mod download
 
@@ -61,6 +61,8 @@ GO111MODULE=on; go mod download
 ```golang
     apollo.GetStringValue(Key, defaultValue)
     apollo.GetStringValueWithNameSapce(namespace, key, defaultValue)
+    apollo.GetIntValue(Key, defaultValue)
+    apollo.GetIntValueWithNameSapce(namespace, key, defaultValue)
 ```
 
 ### Get namespace file contents
