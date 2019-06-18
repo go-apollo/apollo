@@ -3,7 +3,6 @@ package apollo
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 
 	"github.com/stretchr/testify/suite"
@@ -14,8 +13,6 @@ type CacheTestSuite struct {
 }
 
 func (s *CacheTestSuite) TestCache() {
-	log.Println("test cache")
-	log.Printf("s: %+v", s)
 	cache := newCache()
 
 	cache.set("key", []byte("val"))

@@ -4,10 +4,9 @@ package apollo
 
 import (
 	"encoding/gob"
+	"errors"
 	"os"
 	"sync"
-
-	"gopkg.in/logger.v1"
 )
 
 type namespaceCache struct {
@@ -65,16 +64,14 @@ func (n *namespaceCache) load(name string) error {
 
 	f, err := os.OpenFile(name, os.O_RDONLY, 0755)
 	if err != nil {
-		log.Errorf("Open file error: %s", err)
-		return err
+		return errors.New("open cache file error")
 	}
 	defer f.Close()
 
 	var dumps = map[string]map[string][]byte{}
 
 	if err := gob.NewDecoder(f).Decode(&dumps); err != nil {
-		log.Errorf("file decoder error: %s", err)
-		return err
+		return errors.New("cache file decoder error")
 	}
 
 	for namespace, kv := range dumps {
