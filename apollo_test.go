@@ -5,107 +5,86 @@ package apollo
 import (
 	"log"
 	"os"
-	"testing"
 	"time"
 
+	// "time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	"gopkg.in/apollo.v0/internal/mockserver"
 )
 
-func TestMain(m *testing.M) {
-	setup()
-	code := m.Run()
-	teardown()
-	os.Exit(code)
+type StartWithConfTestSuite struct {
+	suite.Suite
+	changeEvent <-chan *ChangeEvent
+	// updates = WatchUpdate()
+	// apollo *Client
+	// VariableThatShouldStartAtFive int
 }
 
-func setup() {
-	go func() {
-		if err := mockserver.Run(); err != nil {
-			log.Fatal(err)
-		}
-	}()
-	// wait for mock server to run
-	time.Sleep(time.Millisecond * 10)
-}
-
-func teardown() {
-	mockserver.Close()
-}
-
-func TestApolloStart(t *testing.T) {
-	if err := Start(); err == nil {
-		t.Errorf("Start with default app.yml should return err, got :%v", err)
-	}
-
-	if err := StartWithConfFile("fake.properties"); err == nil {
-		t.Errorf("Start with fake.properties should return err, got :%v", err)
-	}
+func (s *StartWithConfTestSuite) SetupTest() {
 
 	if err := StartWithConfFile("./testdata/app.yml"); err != nil {
-
-		t.Errorf("Start with app.yml should return nil, got :%v", err)
+		log.Fatalf("Start with app.yml should return nil, got :%v", err)
 	}
-	defer Stop()
-	defer os.Remove(defaultDumpFile)
+	// defer Stop()
 
 	if err := defaultClient.loadLocal(defaultDumpFile); err != nil {
-		t.Errorf("loadLocal should return nil, got: %v", err)
+		log.Fatalf("loadLocal should return nil, got: %v", err)
 	}
 
+	s.changeEvent = WatchUpdate()
+
+	// s.apollo = defaultClient
+}
+func (s *StartWithConfTestSuite) TearDownTest() {
+	Stop()
+	defer os.Remove(defaultDumpFile)
+}
+func (s *StartWithConfTestSuite) LoadLocal() {
+	err := defaultClient.loadLocal(defaultDumpFile)
+	assert.NoError(s.T(), err)
+}
+func (s *StartWithConfTestSuite) BeforeGetStringValueWithNameSpace() {
 	mockserver.Set("application", "key", "value")
-	updates := WatchUpdate()
-
-	select {
-	case <-updates:
-	case <-time.After(time.Second * 30):
-	}
-
-	val := GetStringValue("key", "defaultValue")
-	if val != "value" {
-		t.Errorf("GetStringValue of key should = value, got %v", val)
-	}
-
+	s.wait()
+}
+func (s *StartWithConfTestSuite) GetStringValueWithNameSpace() {
+	val := GetStringValueWithNameSpace("application", "key", "defaultValue")
+	assert.Equal(s.T(), "value", val)
+}
+func (s *StartWithConfTestSuite) BeforeGetStringValue() {
 	mockserver.Set("application", "key", "newvalue")
-	select {
-	case <-updates:
-	case <-time.After(time.Second * 30):
-	}
+	s.wait()
+}
+func (s *StartWithConfTestSuite) GetStringValue() {
+	val := GetIntValue("intkey", 0)
+	assert.Equal(s.T(), 1, val)
+}
 
-	val = defaultClient.GetStringValue("key", "defaultValue")
-	if val != "newvalue" {
-		t.Errorf("GetStringValue of key should = newvalue, got %s", val)
-	}
+func (s *StartWithConfTestSuite) BeforeGetIntValue() {
+	mockserver.Set("application", "key", "newvalue")
+	s.wait()
+}
+func (s *StartWithConfTestSuite) GetIntValue() {
+	val := GetStringValue("key", "defaultValue")
+	assert.Equal(s.T(), "newvalue", val)
+}
 
-	mockserver.Delete("application", "key")
-	select {
-	case <-updates:
-	case <-time.After(time.Second * 30):
-	}
-
-	val = GetStringValue("key", "defaultValue")
-	if val != "defaultValue" {
-		t.Errorf("GetStringValue of key should = defaultValue, got %v", val)
-	}
+func (s *StartWithConfTestSuite) BeforeGetNameSpaceContent() {
 
 	mockserver.Set("client.json", "content", `{"name":"apollo"}`)
+	s.wait()
+}
+func (s *StartWithConfTestSuite) GetNameSpaceContent() {
+
+	val := GetNameSpaceContent("client.json", "{}")
+	assert.Equal(s.T(), `{"name":"apollo"}`, val)
+}
+
+func (s *StartWithConfTestSuite) wait() {
 	select {
-	case <-updates:
+	case <-s.changeEvent:
 	case <-time.After(time.Second * 30):
 	}
-
-	val = GetNameSpaceContent("client.json", "{}")
-	if val != `{"name":"apollo"}` {
-		t.Errorf(`GetStringValue of client.json content should  = {"name":"apollo"}, got %v`, val)
-	}
-
-	mockserver.Set("application", "intkey", "1")
-	select {
-	case <-updates:
-	case <-time.After(time.Second * 30):
-	}
-	intv := GetIntValue("intkey", 0)
-	if intv != 1 {
-		t.Errorf("GetIntValue of client content should == 1, got %d", intv)
-	}
-
 }
