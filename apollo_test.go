@@ -8,8 +8,6 @@ import (
 	"testing"
 	"time"
 
-	// "time"
-
 	"github.com/stretchr/testify/suite"
 
 	"gopkg.in/apollo.v0/internal/mockserver"
@@ -21,7 +19,6 @@ type StartWithConfTestSuite struct {
 }
 
 func (s *StartWithConfTestSuite) SetupSuite() {
-	startMockServer()
 	startTestApollo()
 	s.changeEvent = WatchUpdate()
 }
@@ -42,8 +39,6 @@ func (s *StartWithConfTestSuite) BeforeTest(suiteName, testName string) {
 func (s *StartWithConfTestSuite) TearDownSuite() {
 	Stop()
 	os.Remove(defaultDumpFile)
-	time.Sleep(5 * time.Second)
-	mockserver.Close()
 }
 func (s *StartWithConfTestSuite) TestLoadLocal() {
 	err := defaultClient.loadLocal(defaultDumpFile)
@@ -95,36 +90,18 @@ func startMockServer() {
 	time.Sleep(time.Millisecond * 10)
 }
 
-func (s *StartWithConfTestSuite) TestRunCacheSuite() {
-
-	cs := new(CacheTestSuite)
-	cs.SetT(s.T())
-	s.Run("TestCache", cs.TestCache)
-	s.Run("TestCacheDump", cs.TestCacheDump)
-}
-
-func (s *StartWithConfTestSuite) TestRunNotificationSuite() {
-
-	ns := new(NotificationTestSuite)
-	ns.SetT(s.T())
-	s.Run("TestNotification", ns.TestNotification)
-}
-func (s *StartWithConfTestSuite) TestRunCommonSuite() {
-
-	cs := new(CommonTestSuite)
-	cs.SetT(s.T())
-	s.Run("TestLocalIp", cs.TestLocalIp)
-	s.Run("TestConfigURL", cs.TestConfigURL)
-	s.Run("TestNotificationURL", cs.TestNotificationURL)
-}
-func (s *StartWithConfTestSuite) TestRunChangeSuite() {
-	cs := new(ChangeTestSuite)
-	cs.SetT(s.T())
-	s.Run("TestCache", cs.TestChangeType)
-	s.Run("TestMakeAddChange", cs.TestMakeAddChange)
-	s.Run("TestMakeModifyChange", cs.TestMakeModifyChange)
-	s.Run("TestMakeDeleteChange", cs.TestMakeDeleteChange)
-}
 func TestRunSuite(t *testing.T) {
 	suite.Run(t, new(StartWithConfTestSuite))
+}
+func TestMain(m *testing.M) {
+	setup()
+	code := m.Run()
+	tearDown()
+	os.Exit(code)
+}
+func setup() {
+	startMockServer()
+}
+func tearDown() {
+	mockserver.Close()
 }

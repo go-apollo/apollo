@@ -3,6 +3,8 @@
 package apollo
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -29,4 +31,7 @@ func (s *NotificationTestSuite) TestNotification() {
 
 	str := repo.toString()
 	s.NotEmpty(str)
+}
+func TestRunNotificationSuite(t *testing.T) {
+	suite.Run(t, new(NotificationTestSuite))
 }

@@ -2,6 +2,8 @@
 package apollo
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -37,6 +39,6 @@ func (s *ChangeTestSuite) TestMakeAddChange() {
 
 }
 
-// func TestRunChangeSuite(t *testing.T) {
-// 	suite.Run(t, new(CacheTestSuite))
-// }
+func TestRunChangeSuite(t *testing.T) {
+	suite.Run(t, new(ChangeTestSuite))
+}

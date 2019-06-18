@@ -4,6 +4,7 @@ package apollo
 
 import (
 	"net/url"
+	"testing"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -37,4 +38,9 @@ func (s *CommonTestSuite) TestConfigURL() {
 		}, "application", "")
 	_, err := url.Parse(target)
 	s.NoError(err)
+}
+
+func TestRunCommonSuite(t *testing.T) {
+	cs := new(CommonTestSuite)
+	suite.Run(t, cs)
 }

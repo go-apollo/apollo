@@ -4,6 +4,7 @@ package apollo
 import (
 	"io/ioutil"
 	"os"
+	"testing"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -62,4 +63,8 @@ func (s *CacheTestSuite) TestCacheDump() {
 	s.Error(restore.load("null"))
 
 	s.Error(restore.load("./testdata/app.yml"))
+}
+
+func TestRunCacheSuite(t *testing.T) {
+	suite.Run(t, new(CacheTestSuite))
 }
