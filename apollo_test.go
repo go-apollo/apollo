@@ -37,7 +37,7 @@ func (s *StartWithConfTestSuite) BeforeTest(suiteName, testName string) {
 	// log.Println("testName: " + testName)
 }
 func (s *StartWithConfTestSuite) TearDownSuite() {
-	Stop()
+	s.NoError(Stop())
 	os.Remove(defaultDumpFile)
 }
 func (s *StartWithConfTestSuite) TestLoadLocal() {
