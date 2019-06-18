@@ -27,6 +27,7 @@ notifications:
 # flunk the build and immediately stop. It's sorta like having
 # set -e enabled in bash. 
 before_script:
+  - export GO111MODULE=on
   - mkdir -p $HOME/gopath/src/gopkg.in
   - echo $TRAVIS_BUILD_DIR
   - mv $TRAVIS_BUILD_DIR $HOME/gopath/src/gopkg.in/apollo.v0
