@@ -46,6 +46,9 @@ name: go-1-12
 steps:
 - name: test
   image: golang:1.12
+  environment:
+  COVERALLS_TOKEN:
+    from_secret: repo_token
   commands:
   - GO_FILES=$(find . -iname '*.go' -type f | egrep -v '/vendor') # All the .go files, excluding vendor/
   - go get -u golang.org/x/lint/golint                                # Linter
@@ -58,3 +61,7 @@ steps:
   - gocyclo -over 19 $GO_FILES                                       # forbid code with huge functions
   - golint -set_exit_status $(go list ./...)                         # one last linter
   - go test -v $(go list ./... | egrep -v '/vendor')
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
+  - go test -v -covermode=count -coverprofile=coverage.out
+  - goveralls -coverprofile=coverage.out -service drone.io -repotoken $COVERALLS_TOKEN
