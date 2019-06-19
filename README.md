@@ -3,7 +3,7 @@
 [![Build Status](https://cloud.drone.io/api/badges/go-apollo/apollo/status.svg)](https://cloud.drone.io/go-apollo/apollo)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-apollo/apollo)](https://goreportcard.com/report/github.com/go-apollo/apollo)
 [![](https://godoc.org/gopkg.in/apollo.v0?status.svg)](http://godoc.org/gopkg.in/apollo.v0)
-
+[![Coverage Status](https://coveralls.io/repos/github/go-apollo/apollo/badge.svg?branch=master)](https://coveralls.io/github/go-apollo/apollo?branch=master)
 ## Purpose
 
 The goal of this project is to make the easiest way of using Ctrip apollo for golang applications. This project has been forked from [philchia/agollo](https://github.com/philchia/agollo) since 2018.8 but change a lot.
