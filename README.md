@@ -39,6 +39,38 @@ GO111MODULE=on; go mod download
 
 ## Usage
 
+### Set custom logger
+go-apoll use gopkg.in/logger.v1 as default logger provider.
+Any logger implemented apollo.Logger interface can be use as apollo logger provider(such as [logrus](https://github.com/sirupsen/logrus)).
+```go
+//Logger interface
+type Logger interface {
+	Warnf(format string, v ...interface{})
+	Warn(v ...interface{})
+	Errorf(format string, v ...interface{})
+	Error(v ...interface{})
+	Infof(format string, v ...interface{})
+	Info(v ...interface{})
+	Debugf(format string, v ...interface{})
+	Debug(v ...interface{})
+	Fatal(args ...interface{})
+	Fatalf(format string, args ...interface{})
+}
+```
+set logrus as log provider
+```go
+var log = logrus.New()
+log.Formatter = new(logrus.JSONFormatter)
+log.Formatter = new(logrus.TextFormatter)                     //default
+log.Formatter.(*logrus.TextFormatter).DisableColors = true    // remove colors
+log.Formatter.(*logrus.TextFormatter).DisableTimestamp = true // remove timestamp from test output
+log.Level = logrus.TraceLevel
+log.Out = os.Stdout
+
+apollo.SetLogger(log)
+```
+
+
 ### Start use default app.yml config file
 
 ```golang

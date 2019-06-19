@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-
-	"gopkg.in/logger.v1"
 )
 
 // Client for apollo

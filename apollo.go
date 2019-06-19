@@ -3,8 +3,6 @@
 //Package apollo ctrip apollo go client
 package apollo
 
-import log "gopkg.in/logger.v1"
-
 var (
 	defaultClient *Client
 )
@@ -26,6 +24,9 @@ func StartWithConfFile(name string) error {
 
 // StartWithConf run apollo with Conf
 func StartWithConf(conf *Conf) error {
+	if log == nil {
+		setDefaultLogger()
+	}
 	defaultClient = NewClient(conf)
 
 	return defaultClient.Start()

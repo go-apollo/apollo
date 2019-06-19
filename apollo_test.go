@@ -3,7 +3,6 @@
 package apollo
 
 import (
-	"log"
 	"os"
 	"testing"
 	"time"
@@ -43,6 +42,9 @@ func (s *StartWithConfTestSuite) TearDownSuite() {
 func (s *StartWithConfTestSuite) TestLoadLocal() {
 	err := defaultClient.loadLocal(defaultDumpFile)
 	s.NoError(err)
+}
+func (s *StartWithConfTestSuite) TestLogger() {
+	s.NotNil(log)
 }
 
 func (s *StartWithConfTestSuite) TestGetStringValueWithNameSpace() {
@@ -100,6 +102,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 func setup() {
+	setDefaultLogger()
 	startMockServer()
 }
 func tearDown() {
