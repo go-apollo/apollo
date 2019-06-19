@@ -37,13 +37,16 @@ func (n *namespaceCache) mustGetCache(namespace string) *cache {
 }
 
 func (n *namespaceCache) drain() {
+	n.lock.Lock()
+	defer n.lock.Unlock()
 	for namespace := range n.caches {
 		delete(n.caches, namespace)
 	}
 }
 
 func (n *namespaceCache) dump(name string) error {
-
+	n.lock.Lock()
+	defer n.lock.Unlock()
 	var dumps = map[string]map[string][]byte{}
 
 	for namespace, cache := range n.caches {

@@ -156,6 +156,20 @@ func (c *Client) GetNameSpaceContent(namespace, defaultValue string) string {
 	return c.GetStringValueWithNameSpace(namespace, "content", defaultValue)
 }
 
+// ListKeys list all keys under given namespace
+func (c *Client) ListKeys(namespace string) []string {
+	var keys []string
+	cache := c.mustGetCache(namespace)
+	cache.kv.Range(func(k, _ interface{}) bool {
+		str, ok := k.(string)
+		if ok {
+			keys = append(keys, str)
+		}
+		return true
+	})
+	return keys
+}
+
 // sync namespace config
 func (c *Client) sync(namespace string) (*ChangeEvent, error) {
 	releaseKey := c.getReleaseKey(namespace)
