@@ -20,7 +20,7 @@ Fork -> Patch -> Push -> Pull Request
 
 ## Required
 
-**go 1.11** or later
+**go 1.10** or later
 
 ## Installation
 
