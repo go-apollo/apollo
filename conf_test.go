@@ -1,9 +1,17 @@
 //Copyright (c) 2017 Phil
 package apollo
 
-import "testing"
+import (
+	"testing"
 
-func TestNewConf(t *testing.T) {
+	"github.com/stretchr/testify/suite"
+)
+
+type TestConfigSuite struct {
+	suite.Suite
+}
+
+func (ts *TestConfigSuite) TestNewConf() {
 	var tcs = []struct {
 		name    string
 		wantErr bool
@@ -23,8 +31,15 @@ func TestNewConf(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		if _, err := NewConf(tc.name); (err == nil) == tc.wantErr {
-			t.FailNow()
+		_, err := NewConf(tc.name)
+		if tc.wantErr {
+			ts.Error(err)
+		} else {
+			ts.NoError(err)
 		}
 	}
+}
+
+func TestRunConfigSuite(t *testing.T) {
+	suite.Run(t, new(TestConfigSuite))
 }
