@@ -19,20 +19,15 @@ type StartWithConfTestSuite struct {
 }
 
 func (s *StartWithConfTestSuite) SetupSuite() {
-	startTestApollo()
+	startTestApollo(s)
 	s.changeEvent = WatchUpdate()
 	mockserver.Set("application", "getkeys", "value")
 	s.wait()
 }
-func startTestApollo() {
-	if err := StartWithConfFile("./testdata/app.yml"); err != nil {
-		log.Fatalf("Start with app.yml should return nil, got :%v", err)
-	}
-	// defer Stop()
-
-	if err := defaultClient.loadLocal(defaultDumpFile); err != nil {
-		log.Fatalf("loadLocal should return nil, got: %v", err)
-	}
+func startTestApollo(s *StartWithConfTestSuite) {
+	s.Error(Start())
+	s.NoError(StartWithConfFile("./testdata/app.yml"))
+	s.NoError(defaultClient.loadLocal(defaultDumpFile))
 }
 func (s *StartWithConfTestSuite) BeforeTest(suiteName, testName string) {
 	// log.Println("suiteName: " + suiteName)
@@ -47,6 +42,10 @@ func (s *StartWithConfTestSuite) TestLoadLocal() {
 	s.NoError(err)
 }
 func (s *StartWithConfTestSuite) TestLogger() {
+	setDefaultLogger()
+	s.IsType(&logger.Logger{}, log)
+	setLogger()
+	s.Equal(0, logger.GetOutputLevel())
 	s.NotNil(log)
 }
 
@@ -61,7 +60,9 @@ func (s *StartWithConfTestSuite) TestGetStringValue() {
 	mockserver.Set("application", "key", "newvalue")
 	s.wait()
 	val := GetStringValue("key", "defaultValue")
+	val2 := defaultClient.GetStringValue("key", "defaultValue")
 	s.Equal("newvalue", val)
+	s.Equal("newvalue", val2)
 }
 func (s *StartWithConfTestSuite) TestListKeys() {
 	s.NotEmpty(ListKeys(defaultNamespace))
@@ -70,6 +71,7 @@ func (s *StartWithConfTestSuite) TestGetIntValue() {
 	mockserver.Set("application", "intkey", "1")
 	s.wait()
 	val := GetIntValue("intkey", 0)
+	s.NotEqual(0, val)
 	s.Equal(1, val)
 }
 func (s *StartWithConfTestSuite) TestGetNameSpaceContent() {
@@ -104,10 +106,13 @@ func TestMain(m *testing.M) {
 	tearDown()
 	os.Exit(code)
 }
-func setup() {
+func setLogger() {
 	mLog := logger.Std
 	mLog.SetOutputLevel(0)
 	SetLogger(mLog)
+}
+func setup() {
+	setLogger()
 	startMockServer()
 }
 func tearDown() {
