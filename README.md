@@ -36,7 +36,7 @@ GO111MODULE=on; go mod download
 go get -u gopkg.in/apollo.v0
 # if you use dep as your golang dep tool (go 1.10)
 dep ensure -add  gopkg.in/apollo.v0
-
+```
 ### Set custom logger(Optional)
 go-apoll use gopkg.in/logger.v1 as default logger provider.
 Any logger implemented apollo.Logger interface can be use as apollo logger provider(such as [logrus](https://github.com/sirupsen/logrus)).
