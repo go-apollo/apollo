@@ -15,8 +15,9 @@ Fork -> Patch -> Push -> Pull Request
 
 - ✅ Multiple namespace support
 - ✅ Fail tolerant
+- ✅  Custom logger
 - ❎  YML to struct 
-- ❎  Custom logger
+
 
 ## Required
 
