@@ -1,4 +1,4 @@
-# Gopkg.in/apollo
+# go-apollo
 
 [![Build Status](https://cloud.drone.io/api/badges/go-apollo/apollo/status.svg)](https://cloud.drone.io/go-apollo/apollo)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-apollo/apollo)](https://goreportcard.com/report/github.com/go-apollo/apollo)
