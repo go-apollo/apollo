@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
+	logger "gopkg.in/logger.v1"
 
 	"gopkg.in/apollo.v0/internal/mockserver"
 )
@@ -20,6 +21,8 @@ type StartWithConfTestSuite struct {
 func (s *StartWithConfTestSuite) SetupSuite() {
 	startTestApollo()
 	s.changeEvent = WatchUpdate()
+	mockserver.Set("application", "getkeys", "value")
+	s.wait()
 }
 func startTestApollo() {
 	if err := StartWithConfFile("./testdata/app.yml"); err != nil {
@@ -60,7 +63,9 @@ func (s *StartWithConfTestSuite) TestGetStringValue() {
 	val := GetStringValue("key", "defaultValue")
 	s.Equal("newvalue", val)
 }
-
+func (s *StartWithConfTestSuite) TestListKeys() {
+	s.NotEmpty(ListKeys(defaultNamespace))
+}
 func (s *StartWithConfTestSuite) TestGetIntValue() {
 	mockserver.Set("application", "intkey", "1")
 	s.wait()
@@ -84,9 +89,7 @@ func (s *StartWithConfTestSuite) wait() {
 }
 func startMockServer() {
 	go func() {
-		if err := mockserver.Run(); err != nil {
-			log.Fatal(err)
-		}
+		log.Fatal(mockserver.Run())
 	}()
 	// wait for mock server to run
 	time.Sleep(time.Millisecond * 10)
@@ -102,7 +105,9 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 func setup() {
-	setDefaultLogger()
+	mLog := logger.Std
+	mLog.SetOutputLevel(0)
+	SetLogger(mLog)
 	startMockServer()
 }
 func tearDown() {

@@ -61,3 +61,8 @@ func GetIntValue(key string, defaultValue int) int {
 func GetNameSpaceContent(namespace, defaultValue string) string {
 	return defaultClient.GetNameSpaceContent(namespace, defaultValue)
 }
+
+// ListKeys list all keys under given namespace
+func ListKeys(namespace string) []string {
+	return defaultClient.ListKeys(namespace)
+}
